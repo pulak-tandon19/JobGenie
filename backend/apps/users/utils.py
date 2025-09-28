@@ -24,6 +24,8 @@ class JWTAuth:
         payload['jti'] = str(uuid.uuid4())
         payload['refresh'] = refresh
 
+        print("payload", payload)
+
         token = jwt.encode(payload, Config.JWT_SECRET, algorithm=Config.JWT_ALGORITHM)
 
         return token

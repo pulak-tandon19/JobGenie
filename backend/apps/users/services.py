@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
@@ -11,8 +11,13 @@ from config import Config
 from .schemas import *
 from .utils import JWTAuth
 from .dependencies import *
+import os
+import shutil
+# from main import IMAGES_DIR
 
 REFRESH_TOKEN_EXPIRY = Config.JWT_REFRESH_TOKEN_EXPIRE_DAYS
+IMAGES_DIR = "images"
+
 
 class UserService:
 
@@ -28,11 +33,13 @@ class UserService:
     async def get_current_user(self, 
     token_details: dict = Depends(AccessTokenBearer()),
 ):
-        user_email = token_details["user"]["email"]
-
-        user = await self.get_user_by_email(user_email)
-
-        return user
+        try:
+    
+            user_email = token_details["user"]["email"]
+            user = await self.get_user_by_email(user_email)
+            return user
+        except:
+            raise InvalidToken()
 
 
     async def login(self, login_data: LoginRequest):
@@ -48,12 +55,12 @@ class UserService:
                 access_token = await self.jwt_auth.create_token(
                     user_data={
                         "email": user.email,
-                        "user_id": str(user.id),
+                        "id": str(user.id),
                     }
                 )
 
                 refresh_token = await self.jwt_auth.create_token(
-                    user_data={"email": user.email, "user_id": str(user.id)},
+                    user_data={"email": user.email, "id": str(user.id)},
                     refresh=True,
                 )
 
@@ -81,3 +88,31 @@ class UserService:
         except:
             raise InvalidToken()
 
+    async def save_profile_picture(self, file: UploadFile) -> str:
+        file_ext = os.path.splitext(file.filename)[1]
+        filename = f"{uuid.uuid4()}{file_ext}"
+        path = os.path.join(IMAGES_DIR, filename)
+        with open(path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        return f"/images/{filename}"
+    
+    async def update_user(self, user: User, payload: UserUpdate):
+        if payload.first_name is not None:
+            user.first_name = payload.first_name
+        if payload.last_name is not None:
+            user.last_name = payload.last_name
+        if payload.profile_picture is not None:
+            user.profile_picture = payload.profile_picture
+
+        self.db.add(user)
+        await self.db.commit()
+        await self.db.refresh(user)
+        return user
+    
+
+async def get_current_user(
+    db: AsyncSession = Depends(get_db),
+    token_details: dict = Depends(AccessTokenBearer()),
+):
+    user_service = UserService(db)
+    return await user_service.get_current_user(token_details)
