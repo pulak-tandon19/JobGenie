@@ -5,4 +5,7 @@ fastapi
 uvicorn
 fastapi-sqlalchemy
 pydantic
+pydantic_settings
+sqlalchemy
 fastapi-users[sqlalchemy]
+passlib[bcrypt]
