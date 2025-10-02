@@ -1,8 +1,11 @@
-version: "3.9"
+version: "3.8"
 
 services:
   streamlit-app:
     build: .
+    container_name: streamlit-app
+    volumes:
+      - .:/app   # use current folder since compose is already in frontend/
     ports:
       - "8501:8501"
     restart: unless-stopped
