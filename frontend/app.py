@@ -1,30 +1,11 @@
 import streamlit as st
 
-# Title
-st.title("JobGenie AI Test App")
+st.set_page_config(page_title="JobGenie AI", page_icon="🧞", layout="centered")
 
-# User input
-name = st.text_input("Enter your name:")
-skills = st.text_area("Enter your skills (comma-separated):")
+col1, col2, col3 = st.columns([1, 2, 1])
 
-# Button
-if st.button("Generate Job Recommendation"):
-    if not name or not skills:
-        st.warning("Please enter your name and skills!")
-    else:
-        # Dummy job recommendations
-        skill_list = [s.strip() for s in skills.split(",")]
-        recommended_jobs = []
-        if "Python" in skill_list:
-            recommended_jobs.append("Backend Developer at TechCorp")
-        if "JavaScript" in skill_list:
-            recommended_jobs.append("Frontend Developer at Webify")
-        if "AWS" in skill_list:
-            recommended_jobs.append("Cloud Engineer at CloudNet")
-        
-        if recommended_jobs:
-            st.success(f"Hi {name}, here are some recommended jobs for you:")
-            for job in recommended_jobs:
-                st.write(f"- {job}")
-        else:
-            st.info("No specific matches found. Try adding more skills!")
+with col2:
+    st.title("JobGenie AI")
+
+pg = st.navigation([st.Page("auth/Auth.py"), st.Page("page_1.py"), st.Page("page_2.py")])
+pg.run()
