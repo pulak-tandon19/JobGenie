@@ -96,6 +96,9 @@ class UserService:
             shutil.copyfileobj(file.file, buffer)
         return f"/images/{filename}"
     
+    async def get_user(self, user:User):
+        return user
+    
     async def update_user(self, user: User, payload: UserUpdate):
         if payload.first_name is not None:
             user.first_name = payload.first_name

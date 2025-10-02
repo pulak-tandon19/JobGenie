@@ -33,6 +33,13 @@ async def upload_profile_picture(file: UploadFile = File(...), user: User = Depe
     url = await user_service.save_profile_picture(file)
     return {"url": url}
 
+@router.get("/users/me", response_model=UserRead)
+async def get_my_profile(user: User = Depends(get_current_user),
+):
+    user_service = UserService()
+    return await user_service.get_user(user)
+
+
 @router.patch("/users/me", response_model=UserRead)
 async def update_me(
     payload: UserUpdate,
@@ -41,3 +48,5 @@ async def update_me(
 ):
     user_service = UserService(db)
     return await user_service.update_user(user, payload)
+
+
