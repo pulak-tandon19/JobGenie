@@ -1,5 +1,5 @@
 import streamlit as st
-from auth.services import AuthService
+from components.auth.services import AuthService
 
 st.set_page_config(page_title="JobGenie AI", page_icon="🧞", layout="centered")
 
