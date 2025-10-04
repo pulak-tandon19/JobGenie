@@ -5,7 +5,6 @@ from config import BASE_API_URL, cookies
 
 
 def make_authorized_request(method: str, url: str, payload: dict = None, files=None):
-    print("reached funcn")
     """
     Makes an API request with access token.
     If token expired (401), refreshes token and retries once.
@@ -23,12 +22,10 @@ def make_authorized_request(method: str, url: str, payload: dict = None, files=N
 
     # If access token expired → try refresh
     if response.status_code == 401 and refresh_token:
-        print("reached unauthorized if")
         refresh_headers = {"Authorization": f"Bearer {refresh_token}"}
         refresh_resp = requests.get(f"{BASE_API_URL}/auth/refresh_token", headers=refresh_headers)
 
         if refresh_resp.status_code == 200:
-            print("got new access")
             new_token_data = refresh_resp.json()
             new_access_token = new_token_data.get("access_token")
 
