@@ -7,7 +7,12 @@ from config import BASE_API_URL, cookies
 class AuthService:
     def register_user(self, email, password):
         payload = {"email": email, "password": password}
-        response = requests.post(f"{BASE_API_URL}/auth/register", json=payload)
+        with st.spinner("Loading... ⏳"):
+            try:
+                response = requests.post(f"{BASE_API_URL}/auth/register", json=payload)
+            except:
+                st.error("Something went wrong, please try again later!")
+                return None
         if response.status_code == 201:
             st.success("User registered successfully! Please log in.")
         else:
@@ -19,8 +24,15 @@ class AuthService:
 
     def login_user(self, email, password):
         payload = {"email": email, "password": password}
-        response = requests.post(f"{BASE_API_URL}/auth/login", json=payload)
+        with st.spinner("Loading... ⏳"):
+            try:
+                response = requests.post(f"{BASE_API_URL}/auth/login", json=payload)
+            except:
+                st.error("Something went wrong, please try again later!")
+                return None
         if response.status_code == 200:
+            st.success("Login successful!")
+
             data = response.json()
             access_token = data.get("access_token")
             refresh_token = data.get("refresh_token")
@@ -29,6 +41,5 @@ class AuthService:
             cookies["access_token"] = access_token
             cookies["refresh_token"] = refresh_token
             cookies.save()
-            st.success("Login successful!")
         else:
             st.error(response.json()['message'])

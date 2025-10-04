@@ -14,10 +14,12 @@ class ProfileService():
         self.headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
     def get_profile(self):
-        response = requests.get(f"{BASE_API_URL}/auth/users/me", headers=self.headers)
-        response = make_authorized_request("GET", "/auth/users/me")
-        return response.json()
-    
+        try:
+            response = make_authorized_request("GET", "/auth/users/me")
+            return response.json()
+        except:
+            return None
+
     def upload_picture(self, file):
         files = {"file": (file.name, file, file.type)}
         response = requests.post(f"{BASE_API_URL}/auth/upload-profile-picture", headers=self.headers, files=files)
