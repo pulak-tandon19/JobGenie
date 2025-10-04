@@ -21,7 +21,6 @@ class AuthService:
         payload = {"email": email, "password": password}
         response = requests.post(f"{BASE_API_URL}/auth/login", json=payload)
         if response.status_code == 200:
-            print("reached if")
             data = response.json()
             access_token = data.get("access_token")
             refresh_token = data.get("refresh_token")
