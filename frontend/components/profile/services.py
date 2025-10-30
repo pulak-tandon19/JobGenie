@@ -30,10 +30,10 @@ class ProfileService():
             return None
     
     def update_profile(self, payload):
-        # response = requests.patch(f"{BASE_API_URL}/auth/users/me", headers=self.headers, json=payload)
         response = make_authorized_request("PATCH", "/auth/users/me", payload=payload)
         if response.status_code == 200:
             st.success("Profile updated successfully!")
             st.session_state.edit_mode = False
+            st.switch_page("components/profile/Profile.py")
         else:
             st.error(str(response.json()))  
