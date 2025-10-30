@@ -22,6 +22,13 @@ with col3:
     if st.button("Login", use_container_width=True):
         st.session_state.page = "login"
 
+if "show_login_again_msg" not in st.session_state:
+    st.session_state.show_login_again_msg = False
+
+if st.session_state.show_login_again_msg:
+    st.error("Session expired. Please log in again.")
+    st.session_state.show_login_again_msg = False
+
 # Show content based on selected page
 if st.session_state.page == "signup":
     with st.form("signup_form"):

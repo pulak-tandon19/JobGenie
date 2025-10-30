@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 from config import BASE_API_URL, cookies
+from common_services import make_authorized_request
 
 class ProfileService():
 
@@ -8,15 +9,17 @@ class ProfileService():
         if cookies.ready():
             ACCESS_TOKEN = cookies.get("access_token")  # assume stored at login
         else:
-            print("reached else")
             st.stop()
 
         self.headers = {"Authorization": f"Bearer {ACCESS_TOKEN}"}
 
     def get_profile(self):
-        response = requests.get(f"{BASE_API_URL}/auth/users/me", headers=self.headers)
-        return response.json()
-    
+        try:
+            response = make_authorized_request("GET", "/auth/users/me")
+            return response.json()
+        except:
+            return None
+
     def upload_picture(self, file):
         files = {"file": (file.name, file, file.type)}
         response = requests.post(f"{BASE_API_URL}/auth/upload-profile-picture", headers=self.headers, files=files)
@@ -27,9 +30,10 @@ class ProfileService():
             return None
     
     def update_profile(self, payload):
-        response = requests.patch(f"{BASE_API_URL}/auth/users/me", headers=self.headers, json=payload)
+        response = make_authorized_request("PATCH", "/auth/users/me", payload=payload)
         if response.status_code == 200:
             st.success("Profile updated successfully!")
             st.session_state.edit_mode = False
+            st.switch_page("components/profile/Profile.py")
         else:
-            st.error(str(response.json()))
+            st.error(str(response.json()))  
